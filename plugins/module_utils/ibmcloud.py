@@ -54,7 +54,8 @@ def iam_authenticate(api_key):
 
 
 def get_cluster(id_or_name, resource_group, access_token):
-    headers = {"Authorization": "Bearer " + access_token, "X-Auth-Resource-Group": resource_group}
+    headers = {"Authorization": "Bearer " + access_token,
+               "X-Auth-Resource-Group": resource_group}
     r = requests.get(cluster_endpoint+"/"+id_or_name, headers=headers)
     if r.status_code == 404:
         raise Exception("cluster not found")
@@ -99,12 +100,11 @@ def add_tag(tag, id, resource_group, access_token):
     return r.json()
 
 
-
 def cluster_create(api_key, resource_group, datacenter, entitlement, machine_type, master_version, name, private_vlan, public_vlan, worker_num, tags):
 
     token = iam_authenticate(api_key)
     headers = {"Authorization": "Bearer " + token["access_token"],
-            "X-Auth-Resource-Group": resource_group}
+               "X-Auth-Resource-Group": resource_group}
     payload = {
         "dataCenter": datacenter,
         "publicServiceEndpoint": True,
@@ -116,29 +116,24 @@ def cluster_create(api_key, resource_group, datacenter, entitlement, machine_typ
     }
 
     if private_vlan != "" and public_vlan != "":
-        payload["privateVlan"]= private_vlan
-        payload["publicVlan"]= public_vlan
+        payload["privateVlan"] = private_vlan
+        payload["publicVlan"] = public_vlan
 
     if "openshift" in master_version:
-        payload["defaultWorkerPoolEntitlement"]= entitlement
+        payload["defaultWorkerPoolEntitlement"] = entitlement
 
-    # print(cluster_endpoint)
-    # print(json.dumps(headers, indent=4))
-    # print(json.dumps(payload, indent=4))
-    already_exists= False
-    created= False
-    cluster_id= ""
+    already_exists = False
+    created = False
+    cluster_id = ""
     for _ in range(3):
-        r= requests.post(cluster_endpoint, headers=headers, json=payload)
+        r = requests.post(cluster_endpoint, headers=headers, json=payload)
         if r.status_code == 201:
-            response= r.json()
-            print("cluster created name :", name)
-            created= True
-            cluster_id= response["id"]
+            response = r.json()
+            created = True
+            cluster_id = response["id"]
             break
         if r.status_code == 409:
-            print("cluster already exists")
-            already_exists= True
+            already_exists = True
             break
         time.sleep(5)
 
@@ -146,30 +141,28 @@ def cluster_create(api_key, resource_group, datacenter, entitlement, machine_typ
         raise Exception("could not create cluster")
 
     if already_exists:
-        cluster= get_cluster(name, resource_group, token["access_token"])
+        cluster = get_cluster(name, resource_group, token["access_token"])
 
-        cluster_id= cluster["id"]
-    
+        cluster_id = cluster["id"]
+
     if tags != "":
         _tags = tags.split(",")
         for tag in _tags:
             tag = tag.strip()
             add_tag(tag, cluster_id, resource_group, token["access_token"])
 
-    tries= 200
-    cluster= {}
+    tries = 200
+    cluster = {}
     while tries > 0:
         token = renew_token(token["refresh_token"])
-        cluster= get_cluster(cluster_id, resource_group, token["access_token"])
+        cluster = get_cluster(cluster_id, resource_group,
+                              token["access_token"])
         # print(json.dumps(cluster, indent=4))
-        ready= cluster_ready(cluster)
+        ready = cluster_ready(cluster)
         if ready:
             return cluster
-        print("sleeping 5 minutes before trying again")
-        tries= tries - 1
+        tries = tries - 1
         time.sleep(300)
     # if we got here, that means the cluster did not become "ready" in 3+ hours
 
     raise Exception("time out")
-
-

@@ -9,7 +9,7 @@ namespace: moficodes
 name: kubeadmin
 
 # The version of the collection. Must be compatible with semantic versioning
-version: 1.0.1
+version: 1.0.3
 
 # The path to the Markdown (.md) readme file. This path is relative to the root of the collection
 readme: README.md
@@ -45,13 +45,13 @@ tags: [ibm,ibmcloud,k8s,kubernetes,openshift]
 dependencies: {}
 
 # The URL of the originating SCM repository
-repository: https://github.com/moficodes/kubeadmin-collection
+repository: https://github.com/moficodes/kubeadmin-ansible-collection
 
 # The URL to any online docs
 documentation: tbd
 
 # The URL to the homepage of the collection/project
-homepage: tbd
+homepage: github.moficodes.io/kubeadmin-ansible-collection
 
 # The URL to the collection issue tracker
-issues: https://github.com/moficodes/kubeadmin-collection/issues
+issues: https://github.com/moficodes/kubeadmin-ansible-collection/issues

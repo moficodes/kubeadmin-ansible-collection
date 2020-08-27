@@ -184,8 +184,7 @@ def run_module():
             module.params['default_pool_size'],
             module.params['tags']
             )
-        print(result_ds)
-        result['data'] = result_ds
+        result['message'] = "success"
         result['changed'] = True
     except Exception as e:
         module.fail_json(msg=e.args, **result)
