@@ -125,6 +125,7 @@ def cluster_create(api_key, resource_group, datacenter, entitlement, machine_typ
     already_exists = False
     created = False
     cluster_id = ""
+    message = ""
     for _ in range(3):
         r = requests.post(cluster_endpoint, headers=headers, json=payload)
         if r.status_code == 201:
@@ -135,10 +136,12 @@ def cluster_create(api_key, resource_group, datacenter, entitlement, machine_typ
         if r.status_code == 409:
             already_exists = True
             break
+
+        message = r.description
         time.sleep(5)
 
     if not created and not already_exists:
-        raise Exception("could not create cluster")
+        raise Exception("could not create cluster. " +  message)
 
     if already_exists:
         cluster = get_cluster(name, resource_group, token["access_token"])
