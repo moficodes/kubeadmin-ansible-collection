@@ -137,7 +137,7 @@ def cluster_create(api_key, resource_group, datacenter, entitlement, machine_typ
             already_exists = True
             break
 
-        message = r.description
+        message = str(r)
         time.sleep(5)
 
     if not created and not already_exists:
