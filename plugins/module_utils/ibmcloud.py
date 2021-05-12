@@ -111,7 +111,7 @@ def cluster_create(api_key, resource_group, datacenter, entitlement, machine_typ
         "machineType": machine_type,
         "masterVersion": master_version,
         "name": name,
-        "skitPermPrecheck": True,
+        "skipPermPrecheck": True,
         "workerNum": worker_num
     }
 
@@ -126,6 +126,7 @@ def cluster_create(api_key, resource_group, datacenter, entitlement, machine_typ
     created = False
     cluster_id = ""
     message = ""
+
     for _ in range(3):
         r = requests.post(cluster_endpoint, headers=headers, json=payload)
         if r.status_code == 201:
@@ -136,8 +137,10 @@ def cluster_create(api_key, resource_group, datacenter, entitlement, machine_typ
         if r.status_code == 409:
             already_exists = True
             break
+        
+        message = r.text
 
-        message = str(r)
+        print(message)
         time.sleep(5)
 
     if not created and not already_exists:
